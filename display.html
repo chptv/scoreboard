@@ -4,46 +4,45 @@
 <meta charset="UTF-8">
 <style>
 body {
-  margin: 0;
-  background: transparent;
-  font-family: Arial, sans-serif;
-  color: white;
+  margin:0;
+  background:transparent;
+  font-family: Arial;
+  color:white;
 }
 #scoreboard {
   background: rgba(0,0,0,0.7);
   padding: 12px 20px;
-  border-radius: 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 15px;
+  border-radius: 14px;
 }
 .team { font-size: 26px; }
-.score { font-size: 42px; font-weight: bold; }
-.period { font-size: 20px; }
+.score { font-size: 44px; font-weight: bold; }
 </style>
 </head>
-
 <body>
+
 <div id="scoreboard">
-  <span class="team" id="home">LOCAL</span>
-  <span class="score" id="hs">0</span>
-  <span>-</span>
-  <span class="score" id="as">0</span>
-  <span class="team" id="away">VISITANTE</span>
-  <span class="period">P<span id="period">1</span></span>
+  <span id="home">LOCAL</span>
+  <span id="hs">0</span> -
+  <span id="as">0</span>
+  <span id="away">VISITANTE</span>
 </div>
 
 <script>
-async function update() {
-  const r = await fetch("data.json?"+Date.now());
-  const d = await r.json();
+const bc = new BroadcastChannel("scoreboard");
+
+bc.onmessage = e => update(e.data);
+
+function update(d){
   home.innerText = d.home;
   away.innerText = d.away;
   hs.innerText = d.hs;
   as.innerText = d.as;
-  period.innerText = d.period;
 }
-setInterval(update, 500);
+
+const saved = localStorage.getItem("score");
+if(saved) update(JSON.parse(saved));
 </script>
+
 </body>
 </html>
+
