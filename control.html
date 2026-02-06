@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>CONTROL MARCADOR</h2>
+
+Local:
+<input id="home" value="LOCAL"><br><br>
+Visitante:
+<input id="away" value="VISITANTE"><br><br>
+
+<button onclick="add('hs',1)">+ Gol Local</button>
+<button onclick="add('hs',-1)">- Gol Local</button><br><br>
+
+<button onclick="add('as',1)">+ Gol Visitante</button>
+<button onclick="add('as',-1)">- Gol Visitante</button><br><br>
+
+<button onclick="addPeriod()">+ Periodo</button>
+
+<script>
+async function add(team, val) {
+  const r = await fetch("data.json");
+  const d = await r.json();
+
+  d[team] = Math.max(0, d[team] + val);
+  d.home = home.value;
+  d.away = away.value;
+
+  save(d);
+}
+
+async function addPeriod() {
+  const r = await fetch("data.json");
+  const d = await r.json();
+  d.period++;
+  save(d);
+}
+
+async function save(data) {
+  await fetch("https://api.github.com/repos/TU_USUARIO/scoreboard/contents/data.json", {
+    method: "PUT",
+    headers: {
+      "Authorization": "token TU_TOKEN",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      message: "update score",
+      content: btoa(JSON.stringify(data))
+    })
+  });
+}
+</script>
+</body>
+</html>
