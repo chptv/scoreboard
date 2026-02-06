@@ -3,51 +3,35 @@
 <body>
 <h2>CONTROL MARCADOR</h2>
 
-Local:
-<input id="home" value="LOCAL"><br><br>
-Visitante:
-<input id="away" value="VISITANTE"><br><br>
+Local <input id="home" value="LOCAL"><br><br>
+Visitante <input id="away" value="VISITANTE"><br><br>
 
-<button onclick="add('hs',1)">+ Gol Local</button>
-<button onclick="add('hs',-1)">- Gol Local</button><br><br>
+<button onclick="chg('hs',1)">+ Local</button>
+<button onclick="chg('hs',-1)">- Local</button><br><br>
 
-<button onclick="add('as',1)">+ Gol Visitante</button>
-<button onclick="add('as',-1)">- Gol Visitante</button><br><br>
-
-<button onclick="addPeriod()">+ Periodo</button>
+<button onclick="chg('as',1)">+ Visitante</button>
+<button onclick="chg('as',-1)">- Visitante</button><br><br>
 
 <script>
-async function add(team, val) {
-  const r = await fetch("data.json");
-  const d = await r.json();
+const bc = new BroadcastChannel("scoreboard");
 
-  d[team] = Math.max(0, d[team] + val);
-  d.home = home.value;
-  d.away = away.value;
+let data = {
+  home: "LOCAL",
+  away: "VISITANTE",
+  hs: 0,
+  as: 0
+};
 
-  save(d);
-}
+function chg(t,v){
+  data[t] = Math.max(0, data[t] + v);
+  data.home = home.value;
+  data.away = away.value;
 
-async function addPeriod() {
-  const r = await fetch("data.json");
-  const d = await r.json();
-  d.period++;
-  save(d);
-}
-
-async function save(data) {
-  await fetch("https://api.github.com/repos/chptv/scoreboard/contents/data.json", {
-    method: "PUT",
-    headers: {
-      "Authorization": "token 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",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      message: "update score",
-      content: btoa(JSON.stringify(data))
-    })
-  });
+  localStorage.setItem("score", JSON.stringify(data));
+  bc.postMessage(data);
 }
 </script>
+
 </body>
 </html>
+
